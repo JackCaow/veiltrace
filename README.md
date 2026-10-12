@@ -22,6 +22,8 @@ No Python, model download, native addon, or extra runtime process. Three ESM ent
 The package is not published to npm yet. Clone this repository and install a local tarball:
 
 ```sh
+git clone https://github.com/JackCaow/veiltrace.git
+cd veiltrace
 npm ci
 npm test
 npm pack

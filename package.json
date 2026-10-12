@@ -4,6 +4,14 @@
   "description": "Visual-first TypeScript research toolkit for subtle screen watermarking",
   "type": "module",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JackCaow/veiltrace.git"
+  },
+  "homepage": "https://github.com/JackCaow/veiltrace#readme",
+  "bugs": {
+    "url": "https://github.com/JackCaow/veiltrace/issues"
+  },
   "engines": {
     "node": ">=20"
   },
