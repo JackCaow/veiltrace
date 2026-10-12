@@ -11,6 +11,8 @@ export class ScreenOverlay {
   private readonly negative: HTMLDivElement
   private readonly oldPosition: string
   private readonly oldIsolation: string
+  private readonly oldWillChange: string
+  private ownedWillChange = ''
   private patchedPosition = false
   private patchedIsolation = false
   private disposed = false
@@ -31,6 +33,7 @@ export class ScreenOverlay {
     this.target = target
     this.oldPosition = target.style.position
     this.oldIsolation = target.style.isolation
+    this.oldWillChange = target.style.willChange
     this.positive = this.layer('positive', 'plus-lighter', 2147483645)
     this.negative = this.layer('negative', 'difference', 2147483646)
     const urls = this.urls(options)
@@ -41,6 +44,18 @@ export class ScreenOverlay {
     if (view.getComputedStyle(target).isolation !== 'isolate') {
       target.style.isolation = 'isolate'
       this.patchedIsolation = true
+    }
+    // Keep the host's compositing surface stable when marks are toggled. Without
+    // this, Linux Chromium may switch glyphs between LCD and grayscale AA.
+    const hint = view.getComputedStyle(target).willChange
+    if (
+      !hint
+        .split(',')
+        .map((value) => value.trim())
+        .includes('opacity')
+    ) {
+      this.ownedWillChange = hint === 'auto' ? 'opacity' : `${hint}, opacity`
+      target.style.willChange = this.ownedWillChange
     }
     this.positive.style.backgroundImage = `url("${urls[0]}")`
     this.negative.style.backgroundImage = `url("${urls[1]}")`
@@ -102,6 +117,8 @@ export class ScreenOverlay {
       this.target.style.position = this.oldPosition
     if (this.patchedIsolation && this.target.style.isolation === 'isolate')
       this.target.style.isolation = this.oldIsolation
+    if (this.ownedWillChange && this.target.style.willChange === this.ownedWillChange)
+      this.target.style.willChange = this.oldWillChange
     this.disposed = true
   }
 }

@@ -100,12 +100,12 @@ try {
           }
         // Chromium can change text antialiasing when blend layers create compositing
         // surfaces. Record actual deltas; the core residual bound is not a DOM bound.
+        const filename = `${surface}-${channel}-${amplitude}.png`
+        await fs.writeFile(path.join(output, filename), marked)
         assert.ok(
           Math.max(...maxima) <= Math.ceil(amplitude) + 2,
           `${surface}/${channel}/${amplitude}: unexpected compositor delta: ${maxima}`,
         )
-        const filename = `${surface}-${channel}-${amplitude}.png`
-        await fs.writeFile(path.join(output, filename), marked)
         const checks = []
         const attacks = [
           ['png', async () => marked],
@@ -166,6 +166,8 @@ try {
     overlay.dispose()
     overlay.dispose()
     if (document.querySelectorAll('[data-veiltrace]').length) throw new Error('Layers leaked')
+    if (document.querySelector('#stage').style.willChange !== '')
+      throw new Error('Compositing hint leaked')
     window.veiltraceLab.update()
     try {
       window.veiltraceLab.overlay.update({ recordId: 'invalid' })

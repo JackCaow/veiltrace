@@ -42,7 +42,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "npm run build && node --test tests/*.test.mjs",
+    "test": "npm run build && node --test",
     "demo": "npm run build && node scripts/serve.mjs",
     "benchmark": "npm run build && node scripts/benchmark.mjs",
     "verify:electron": "npm run build && node scripts/verify-electron.mjs",

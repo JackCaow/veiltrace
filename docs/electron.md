@@ -16,9 +16,10 @@ tenant. `update` takes complete options; omitted options reset to defaults.
 Invalid updates dispose the old layers before throwing, so stale identity is not
 retained. Removing a host requires disposing its overlay.
 
-`ScreenOverlay` may set `position: relative` and `isolation: isolate`. It restores
+`ScreenOverlay` may set `position: relative`, `isolation: isolate`, and an `opacity`
+will-change hint to stabilize compositing during toggles. It restores
 its own inline changes on disposal, unless application code replaced those values.
-Review stacking contexts and modal/teleport placement in the actual application.
+Review stacking contexts, compositing memory, and modal/teleport placement in the actual application.
 Overlay layers have `pointer-events: none`, `aria-hidden`, and no mouse handlers.
 It does not cover native video surfaces, separate BrowserViews/webviews or other
 windows. It is not tamper-resistant.
