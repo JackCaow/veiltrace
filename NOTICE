@@ -1,0 +1,6 @@
+VeilTrace
+Copyright 2026 VeilTrace contributors
+
+This project contains an original experimental TypeScript watermark implementation.
+It includes no third-party watermark models or proprietary application data.
+Third-party packages retain their respective licenses.

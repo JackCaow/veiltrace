@@ -1,0 +1,54 @@
+{
+  "name": "veiltrace",
+  "version": "0.1.0-alpha.1",
+  "description": "Visual-first TypeScript research toolkit for subtle screen watermarking",
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser/index.d.ts",
+      "import": "./dist/browser/index.js"
+    },
+    "./node": {
+      "types": "./dist/node/index.d.ts",
+      "import": "./dist/node/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "docs",
+    "examples"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "demo": "npm run build && node scripts/serve.mjs",
+    "benchmark": "npm run build && node scripts/benchmark.mjs",
+    "verify:electron": "npm run build && node scripts/verify-electron.mjs",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "pngjs": "7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pngjs": "^6.0.5",
+    "playwright": "^1.58.0",
+    "prettier": "^3.6.2",
+    "sharp": "^0.35.5",
+    "typescript": "5.9.3"
+  }
+}

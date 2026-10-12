@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VeilTrace · Visual Lab</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <strong>VeilTrace</strong><span class="tag">RESEARCH ALPHA</span>
+        <p>Visual quality first. Recovery claims second.</p>
+      </div>
+      <a href="#decoder">Local decoder ↓</a>
+    </header>
+    <section class="controls">
+      <label
+        >Surface<select id="surface">
+          <option value="dark">Dark workspace</option>
+          <option value="light">Light workspace</option>
+          <option value="flat-dark">Flat dark</option>
+          <option value="flat-light">Flat light</option>
+        </select></label
+      >
+      <label
+        >Carrier<select id="channel">
+          <option value="blue">Blue channel</option>
+          <option value="gray">All channels</option>
+        </select></label
+      >
+      <label
+        >Residual budget<select id="amplitude">
+          <option value="0.75">0.75 / 255</option>
+          <option value="1" selected>1 / 255</option>
+          <option value="2">2 / 255</option>
+          <option value="3">3 / 255 · stress test</option>
+        </select></label
+      >
+      <label
+        >Opaque record ID<input
+          id="record"
+          value="123456abcdef"
+          maxlength="12"
+          pattern="[0-9a-f]{12}"
+      /></label>
+      <button id="toggle" aria-pressed="true">Watermark ON</button>
+    </section>
+    <p id="state" role="status">Generating experimental layers…</p>
+    <main id="stage" data-surface="dark">
+      <aside class="rail">
+        <div class="brand">V</div>
+        <b>Workspace</b><a class="selected">Messages</a><a>Calendar</a><a>Meetings</a><a>Tasks</a
+        ><a>Files</a>
+        <footer>Offline specimen<br />No account data</footer>
+      </aside>
+      <section class="inbox">
+        <h3>Conversations</h3>
+        <div class="search">Search messages</div>
+        <article class="active">
+          <i class="avatar">P</i>
+          <div>
+            <b>Product team</b>
+            <p>Ready for design review</p>
+          </div>
+          <small>10:30</small>
+        </article>
+        <article>
+          <i class="avatar purple">D</i>
+          <div>
+            <b>Design team</b>
+            <p>New components are ready</p>
+          </div>
+          <small>09:45</small>
+        </article>
+        <article>
+          <i class="avatar green">E</i>
+          <div>
+            <b>Engineering</b>
+            <p>Build checks passed</p>
+          </div>
+          <small>Yesterday</small>
+        </article>
+      </section>
+      <section class="conversation">
+        <div class="chat-head">
+          <h3>Product team</h3>
+          <span>8 members · fictional data</span>
+        </div>
+        <div class="messages">
+          <div class="date">Monday, 10:30</div>
+          <p class="sender">Alex</p>
+          <div class="bubble">
+            Let's keep the workspace calm and readable.<br />Changes should be subtle, especially on
+            dark surfaces.
+          </div>
+          <p class="sender self">You</p>
+          <div class="bubble outgoing">
+            Agreed. We will review visual quality before measuring recovery.
+          </div>
+          <p class="sender">Sam</p>
+          <div class="bubble">
+            Design review checklist:<br />1. No visible pattern<br />2. No color cast<br />3. No
+            flicker during scrolling
+          </div>
+          <div class="doc">
+            <b>Review notes</b>
+            <p>
+              Visual examples and all measurements are synthetic.<br />A recovered ID is a tracing
+              hint, not identity proof.
+            </p>
+            <div class="line"></div>
+            <div class="line short"></div>
+          </div>
+        </div>
+        <div class="composer">
+          Message the team…
+          <p>＋ &nbsp; ☺ &nbsp; ↗</p>
+        </div>
+      </section>
+    </main>
+    <section id="decoder" class="decoder">
+      <div>
+        <h2>Check a screenshot</h2>
+        <p>
+          Use your system screenshot tool to capture the specimen above. Upload that image locally.
+          Nothing leaves this computer.
+        </p>
+        <p>
+          Not found is a valid result. Small crops, JPEG, and untested scales can remove the signal.
+        </p>
+      </div>
+      <div>
+        <input id="upload" type="file" accept="image/png,image/jpeg,image/webp" />
+        <pre id="result">No image selected.</pre>
+      </div>
+    </section>
+    <footer class="disclaimer">
+      Experimental digital-screenshot protocol. No phone-camera validation. The CRC checks
+      integrity, not authenticity. This demo uses additive/difference CSS blending; clipping
+      behavior differs from the offline encoder at black/white limits.
+    </footer>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

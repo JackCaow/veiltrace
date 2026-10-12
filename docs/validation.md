@@ -1,0 +1,37 @@
+# Validation scope
+
+Local verification on macOS Apple Silicon, October 12, 2026. Synthetic content
+only. These results describe the included fixture, not arbitrary office pages.
+
+| Check                                                 | Result                                   |
+| ----------------------------------------------------- | ---------------------------------------- |
+| Core, FFT, PNG adapter, invalid inputs                | 9 automated tests passed                 |
+| Chrome DPR 1, default blue/amplitude 1, four surfaces | 4/4 native PNG records recovered         |
+| Same four surfaces, 640×480 crop at offset 37,53      | 4/4 records recovered                    |
+| Same four surfaces, JPEG quality 85                   | 0/4 records recovered                    |
+| Same four surfaces, 75% resize                        | 0/4 records recovered                    |
+| Original unmarked Chrome fixtures                     | 0/4 accepted                             |
+| Electron 37.10.0 macOS, DPR 2, default settings       | Dark and light native captures recovered |
+| Electron local Worker upload of those PNGs            | Both records recovered                   |
+| Electron secure preferences and overlay lifecycle     | Passed                                   |
+
+Chrome measurements at default settings had maximum per-channel differences
+`1/1/1` over each full fixture (background-only marking changes blue; compositing
+can affect other channels). Electron DPR 2 native captures measured `1/1/1` over
+each full fixture and `0/0/1` over a known empty rail region. This is not a bound
+for every renderer, image or display. Initial CSS-resolution downsampling of the
+DPR 2 capture both removed the carrier and exposed antialiasing differences up
+to ten levels. Native-resolution capture and DPR-aware drawing are required.
+
+Run `npm run benchmark` to reproduce all 24 parameter rows and 96 attack attempts,
+including misses. It checks default PNG/crop recovery, runtime, lifecycle,
+negatives and a small compositor budget, but does not assert universal decoding.
+Run `npm run verify:electron`
+with `ELECTRON_BINARY` to check actual Electron recovery. Generated reports are
+under `results/` and excluded from Git/package distribution.
+
+No human blind study, phone-camera capture, perspective/rotation, HDR, busy real
+office content, calibrated false-positive rate, tamper resistance, or Windows/
+Linux Electron validation. CI config runs the core on three OSes; that is separate
+from real screenshot acceptance. Higher strengths and gray carriers are experimental
+comparisons, not automatically recommended production settings.
