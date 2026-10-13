@@ -72,13 +72,30 @@ try {
     })
   }
   const capture = () => page.locator('#stage').screenshot({ animations: 'disabled' })
+  report.mountEffects = []
   for (const surface of ['dark', 'light', 'flat-dark', 'flat-light']) {
     await page.selectOption('#surface', surface)
     await waitLayers()
+    await page.evaluate(() => window.veiltraceLab.overlay.dispose())
+    const native = await capture(),
+      nativePixels = PNG.sync.read(native)
+    await fs.writeFile(path.join(output, `${surface}-unmounted.png`), native)
+    await page.evaluate(() => window.veiltraceLab.update())
+    await waitLayers()
     await page.evaluate(() => window.veiltraceLab.overlay.setEnabled(false))
+    await waitLayers()
     const original = await capture(),
       clean = PNG.sync.read(original)
     await fs.writeFile(path.join(output, `${surface}-original.png`), original)
+    const mountMax = [0, 0, 0]
+    for (let i = 0; i < clean.data.length; i += 4)
+      for (let c = 0; c < 3; c++)
+        mountMax[c] = Math.max(mountMax[c], Math.abs(clean.data[i + c] - nativePixels.data[i + c]))
+    report.mountEffects.push({
+      surface,
+      maxChannelChange: mountMax,
+      baseline: 'unmounted versus mounted with neutral layers; no carrier in either',
+    })
     report.negatives.push({ surface, accepted: decodeRGBA(clean) !== null })
     for (const channel of ['blue', 'gray'])
       for (const amplitude of [0.75, 1, 2]) {
@@ -203,11 +220,11 @@ await fs.writeFile(path.join(output, 'checks.json'), JSON.stringify(report, null
 const rows = report.rows
   .map(
     (row) =>
-      `<figure><figcaption>${row.surface} · ${row.channel} · ${row.amplitude}/255 · Δ ${row.maxChannelChange.join('/')} · ${row.checks.map((c) => `${c.attack}:${c.recovered ? 'PASS' : 'MISS'}`).join(' ')}</figcaption><img src="${row.surface}-original.png"><img src="${row.filename}"></figure>`,
+      `<figure><figcaption>${row.surface} · ${row.channel} · ${row.amplitude}/255 · carrier Δ ${row.maxChannelChange.join('/')} · ${row.checks.map((c) => `${c.attack}:${c.recovered ? 'PASS' : 'MISS'}`).join(' ')}</figcaption><img src="${row.surface}-unmounted.png" alt="SDK unmounted"><img src="${row.surface}-original.png" alt="SDK mounted; neutral layers; carrier off"><img src="${row.filename}" alt="Carrier enabled"></figure>`,
   )
   .join('')
 await fs.writeFile(
   path.join(output, 'index.html'),
-  `<meta charset="utf-8"><title>VeilTrace benchmark</title><style>body{background:#14171d;color:#eee;font:14px sans-serif}img{width:48%;vertical-align:top}figure{margin:24px 0}figcaption{margin-bottom:12px}pre{white-space:pre-wrap}</style><h1>Original / marked · browser captures</h1><p>Synthetic data. Pixel-budget checks do not prove imperceptibility. Camera not tested. MISS results are retained.</p>${rows}<pre>${JSON.stringify(report, null, 2)}</pre>`,
+  `<meta charset="utf-8"><title>VeilTrace benchmark</title><style>body{background:#14171d;color:#eee;font:14px sans-serif}img{width:32%;vertical-align:top}figure{margin:24px 0}figcaption{margin-bottom:12px}pre{white-space:pre-wrap}</style><h1>Unmounted / neutral off / carrier on · browser captures</h1><p>Synthetic data. Carrier deltas compare ON with neutral OFF layers. Mounting effects are measured separately in mountEffects; inspect the unmounted image too. Pixel checks do not prove imperceptibility. Camera not tested. MISS results are retained.</p>${rows}<pre>${JSON.stringify(report, null, 2)}</pre>`,
 )
 console.log(`Report: ${path.join(output, 'index.html')}`)

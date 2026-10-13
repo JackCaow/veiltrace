@@ -16,6 +16,9 @@ export class ScreenOverlay {
   private patchedPosition = false
   private patchedIsolation = false
   private disposed = false
+  private enabled = true
+  private currentUrls: string[]
+  private readonly neutralUrl: string
   private readonly resize = () => {
     const view = this.target.ownerDocument.defaultView!
     const ratio = view.devicePixelRatio || 1
@@ -43,6 +46,14 @@ export class ScreenOverlay {
     this.positive = this.layer('positive', 'plus-lighter', 2147483645)
     this.negative = this.layer('negative', 'difference', 2147483646)
     const urls = this.urls(options)
+    this.currentUrls = urls
+    const neutral = target.ownerDocument.createElement('canvas')
+    neutral.width = neutral.height = 256
+    const neutralContext = neutral.getContext('2d')
+    if (!neutralContext) throw new Error('Canvas is unavailable')
+    neutralContext.fillStyle = '#000'
+    neutralContext.fillRect(0, 0, 256, 256)
+    this.neutralUrl = neutral.toDataURL('image/png')
     if (view.getComputedStyle(target).position === 'static') {
       target.style.position = 'relative'
       this.patchedPosition = true
@@ -63,8 +74,7 @@ export class ScreenOverlay {
       this.ownedWillChange = hint === 'auto' ? 'opacity' : `${hint}, opacity`
       target.style.willChange = this.ownedWillChange
     }
-    this.positive.style.backgroundImage = `url("${urls[0]}")`
-    this.negative.style.backgroundImage = `url("${urls[1]}")`
+    this.applyImages()
     target.append(this.positive, this.negative)
     this.resize()
     view.addEventListener('resize', this.resize)
@@ -102,9 +112,8 @@ export class ScreenOverlay {
   update(options: Omit<OverlayOptions, 'target'>): void {
     if (this.disposed) throw new Error('Overlay has been disposed')
     try {
-      const urls = this.urls(options)
-      this.positive.style.backgroundImage = `url("${urls[0]}")`
-      this.negative.style.backgroundImage = `url("${urls[1]}")`
+      this.currentUrls = this.urls(options)
+      this.applyImages()
     } catch (error) {
       this.dispose()
       throw error
@@ -112,7 +121,15 @@ export class ScreenOverlay {
   }
   setEnabled(enabled: boolean): void {
     if (this.disposed) throw new Error('Overlay has been disposed')
-    this.positive.hidden = this.negative.hidden = !enabled
+    this.enabled = enabled
+    this.applyImages()
+  }
+  private applyImages(): void {
+    // Keep neutral blend layers mounted while disabled. Hiding them changes the
+    // host's rounded-clip rasterization in Linux Chromium even with no carrier.
+    const urls = this.enabled ? this.currentUrls : [this.neutralUrl, this.neutralUrl]
+    this.positive.style.backgroundImage = `url("${urls[0]}")`
+    this.negative.style.backgroundImage = `url("${urls[1]}")`
   }
   dispose(): void {
     if (this.disposed) return

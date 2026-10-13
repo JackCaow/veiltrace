@@ -23,6 +23,10 @@ Review stacking contexts, compositing memory, and modal/teleport placement in th
 Layers leave a two-physical-pixel edge guard and follow the host's rounded corners
 to avoid blending directly on its antialiased clip boundary. Corner geometry is
 sampled at construction and resize; use a stable host without animated radii.
+`setEnabled(false)` keeps neutral black blend layers mounted, without a carrier,
+to avoid changing glyph/corner rasterization on each toggle. Use `dispose()` to
+remove the SDK completely. Mounting itself can affect antialiasing; evaluate the
+unmounted versus neutral images in the benchmark, not only the ON/OFF comparison.
 Overlay layers have `pointer-events: none`, `aria-hidden`, and no mouse handlers.
 It does not cover native video surfaces, separate BrowserViews/webviews or other
 windows. It is not tamper-resistant.

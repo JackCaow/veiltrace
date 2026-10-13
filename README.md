@@ -104,6 +104,8 @@ are measurements, not a perceptual guarantee.
 - Overlay blend modes create a stacking context and can affect compositing/text
   antialiasing. The core residual bound is **not** a guarantee on every final DOM
   pixel. At black/white limits CSS blending differs from offline RGBA addition.
+  OFF retains neutral layers to stabilize toggles; `dispose()` removes them.
+  Benchmark `mountEffects` records unmounted-to-neutral changes separately.
 - No phone-camera, HDR, rotation, perspective, adversarial-removal, production
   false-positive-rate, or cross-platform Electron acceptance claim.
 
