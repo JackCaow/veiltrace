@@ -185,6 +185,15 @@ try {
     if (document.querySelectorAll('[data-veiltrace]').length) throw new Error('Layers leaked')
     if (document.querySelector('#stage').style.willChange !== '')
       throw new Error('Compositing hint leaked')
+    const host = document.querySelector('#stage')
+    host.style.borderRadius = '8px'
+    window.veiltraceLab.update()
+    if (
+      host.querySelector('[data-veiltrace]') ||
+      !document.querySelector('#state').textContent.includes('rectangular')
+    )
+      throw new Error('Unsupported rounded host was not rejected explicitly')
+    host.style.borderRadius = ''
     window.veiltraceLab.update()
     try {
       window.veiltraceLab.overlay.update({ recordId: 'invalid' })

@@ -1,6 +1,6 @@
 # Validation scope
 
-Local verification on macOS Apple Silicon, October 12, 2026. Synthetic content
+Local verification on macOS Apple Silicon, October 12–13, 2026. Synthetic content
 only. These results describe the included fixture, not arbitrary office pages.
 
 | Check                                                 | Result                                   |
@@ -15,13 +15,17 @@ only. These results describe the included fixture, not arbitrary office pages.
 | Electron local Worker upload of those PNGs            | Both records recovered                   |
 | Electron secure preferences and overlay lifecycle     | Passed                                   |
 
-Chrome measurements at default settings had maximum per-channel differences
-`1/1/1` over each full fixture (background-only marking changes blue; compositing
-can affect other channels). Electron DPR 2 native captures measured `1/1/1` over
-each full fixture and `0/0/1` over a known empty rail region. This is not a bound
+The final rectangular-host Chrome fixture has default carrier ON/OFF differences
+`0/0/1`. Its unmounted-to-neutral mounting differences are recorded separately in
+`mountEffects` (macOS fixtures measured `1/1/1`). Electron DPR 2 native ON/OFF
+captures measured `0/0/1`, also `0/0/1` over a known empty rail region. This is not a bound
 for every renderer, image or display. Initial CSS-resolution downsampling of the
 DPR 2 capture both removed the carrier and exposed antialiasing differences up
 to ten levels. Native-resolution capture and DPR-aware drawing are required.
+Earlier Linux runs exposed glyph compositing changes and rounded-host boundary
+differences up to 11 levels even with an edge guard. The SDK now rejects rounded
+hosts; those experiments are not claimed as successful visual acceptance. Use a
+rectangular viewport host and separately inspect mounting effects on your display.
 
 Run `npm run benchmark` to reproduce all 24 parameter rows and 96 attack attempts,
 including misses. It checks default PNG/crop recovery, runtime, lifecycle,

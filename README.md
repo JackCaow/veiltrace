@@ -106,6 +106,8 @@ are measurements, not a perceptual guarantee.
   pixel. At black/white limits CSS blending differs from offline RGBA addition.
   OFF retains neutral layers to stabilize toggles; `dispose()` removes them.
   Benchmark `mountEffects` records unmounted-to-neutral changes separately.
+- Use a rectangular viewport host. Rounded hosts are rejected in this alpha due
+  to Chromium clip-boundary artifacts; nested rounded content is allowed.
 - No phone-camera, HDR, rotation, perspective, adversarial-removal, production
   false-positive-rate, or cross-platform Electron acceptance claim.
 

@@ -9,7 +9,11 @@ Import `veiltrace/node` only in Main, a utility process, or a Node worker. This
 package is ESM; CommonJS Main code can use `await import('veiltrace/node')`.
 
 For Vue, create `ScreenOverlay` in `onMounted` and call `dispose` in
-`onBeforeUnmount`. Use a stable, viewport-sized host around the app. Do not attach
+`onBeforeUnmount`. Use a stable, rectangular, viewport-sized host around the app.
+Rounded hosts are explicitly rejected in this alpha because Linux Chromium changes
+their clip-boundary rasterization with blend layers. Nested rounded cards may
+remain inside the viewport host; do not use a rounded card as the overlay host.
+Do not attach
 to scrolling content if you require a stationary screen carrier. Create a new
 overlay in each window and issue a fresh opaque record when changing session or
 tenant. `update` takes complete options; omitted options reset to defaults.
@@ -20,11 +24,11 @@ retained. Removing a host requires disposing its overlay.
 will-change hint to stabilize compositing during toggles. It restores
 its own inline changes on disposal, unless application code replaced those values.
 Review stacking contexts, compositing memory, and modal/teleport placement in the actual application.
-Layers leave a two-physical-pixel edge guard and follow the host's rounded corners
-to avoid blending directly on its antialiased clip boundary. Corner geometry is
-sampled at construction and resize; use a stable host without animated radii.
+Layers leave a two-physical-pixel edge guard. Use a stable host without animated
+radii, transforms or clipping paths. The constructor checks the initial geometry;
+the application must preserve the rectangular host throughout its lifecycle.
 `setEnabled(false)` keeps neutral black blend layers mounted, without a carrier,
-to avoid changing glyph/corner rasterization on each toggle. Use `dispose()` to
+to reduce compositing changes on each toggle. Use `dispose()` to
 remove the SDK completely. Mounting itself can affect antialiasing; evaluate the
 unmounted versus neutral images in the benchmark, not only the ON/OFF comparison.
 Overlay layers have `pointer-events: none`, `aria-hidden`, and no mouse handlers.

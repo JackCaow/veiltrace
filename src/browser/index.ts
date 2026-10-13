@@ -24,16 +24,26 @@ export class ScreenOverlay {
     const ratio = view.devicePixelRatio || 1
     const size = `${256 / ratio}px ${256 / ratio}px`
     this.positive.style.backgroundSize = this.negative.style.backgroundSize = size
-    // Blending on the host's antialiased rounded boundary can double its coverage
-    // in Chromium. Leave a two-device-pixel guard inside the host clip instead.
-    const style = view.getComputedStyle(this.target)
-    const clip = `inset(${2 / ratio}px round ${style.borderRadius || '0px'})`
+    const clip = `inset(${2 / ratio}px)`
     this.positive.style.clipPath = this.negative.style.clipPath = clip
   }
   constructor(options: OverlayOptions) {
     const { target } = options
     if (!target?.ownerDocument?.defaultView) throw new Error('A browser HTMLElement is required')
     const view = target.ownerDocument.defaultView
+    const geometry = view.getComputedStyle(target)
+    if (
+      [
+        geometry.borderTopLeftRadius,
+        geometry.borderTopRightRadius,
+        geometry.borderBottomRightRadius,
+        geometry.borderBottomLeftRadius,
+      ].some((radius) => !/^0(?:px|%)?(?: 0(?:px|%)?)?$/.test(radius))
+    ) {
+      throw new Error(
+        'Use a rectangular viewport host; rounded hosts are not supported in this alpha',
+      )
+    }
     if (
       !view.CSS?.supports('mix-blend-mode', 'plus-lighter') ||
       !view.CSS.supports('mix-blend-mode', 'difference')

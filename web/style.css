@@ -98,7 +98,7 @@ button {
   display: flex;
   min-height: 620px;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 0;
   overflow: hidden;
   color: var(--text);
   background: var(--base);
