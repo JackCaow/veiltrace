@@ -6,6 +6,7 @@ import { PNG } from 'pngjs'
 import sharp from 'sharp'
 import assert from 'node:assert/strict'
 import { decodeRGBA } from '../dist/core/index.js'
+import { checkOverlayOwnership } from './check-overlay-ownership.mjs'
 
 const output = path.resolve('results'),
   port = 18765 + (process.pid % 1000)
@@ -201,6 +202,7 @@ try {
     if (document.querySelectorAll('[data-veiltrace]').length)
       throw new Error('Old identity retained after failure')
   })
+  report.ownership = await checkOverlayOwnership(page)
   report.lifecycle = {
     updateDoesNotDuplicateLayers: true,
     idempotentDispose: true,

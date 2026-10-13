@@ -27,6 +27,7 @@ do not prove the payload is genuine. The CRC can be recomputed by any sender.
 Detection explicitly returns `authenticated: false`.
 
 Public API limits: opaque RGBA, at most 16 million pixels; PNG input at most 16 MiB;
+the Node PNG adapter accepts non-interlaced files only.
 amplitude 0.5–4 channel levels. Browser uses a `256 / devicePixelRatio` CSS-pixel
 tile, updated on window resize, to target 256 **physical** pixels. Core uses a
 256 **image** pixel tile. Capture at native device resolution. Fractional display

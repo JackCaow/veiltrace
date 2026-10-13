@@ -19,6 +19,9 @@ overlay in each window and issue a fresh opaque record when changing session or
 tenant. `update` takes complete options; omitted options reset to defaults.
 Invalid updates dispose the old layers before throwing, so stale identity is not
 retained. Removing a host requires disposing its overlay.
+Only one active instance may own a host. A duplicate constructor throws before
+changing its styles or layers, including a second SDK module loaded during HMR.
+Dispose the old instance before replacing it; disposal releases the ownership.
 
 `ScreenOverlay` may set `position: relative`, `isolation: isolate`, and an `opacity`
 will-change hint to stabilize compositing during toggles. It restores
@@ -50,6 +53,11 @@ The core decoder is synchronous. Run it in a Web Worker in Renderer or a Node
 worker for Main. Apply a pixel limit and deadline for untrusted inputs. Match the
 embedding namespace and channel. PNG is the only format handled by the Node
 adapter; decode other image formats to opaque RGBA separately.
+The Node PNG adapter accepts non-interlaced files only. Its container preflight
+rejects duplicate IHDR, truncated chunks, missing IEND and trailing data before
+calling `pngjs`. Adam7/interlaced PNG is rejected before decompression because
+the dependency's sync interlace path does not bound inflate output. A host needing
+those files must use a separately bounded image decoder and pass raw RGBA to core.
 
 The overlay uses `256 / devicePixelRatio` CSS pixels per tile, so at DPR 2 it draws
 a 128 CSS-pixel tile spanning 256 physical pixels. A window resize updates the

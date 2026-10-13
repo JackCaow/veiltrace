@@ -5,7 +5,7 @@ only. These results describe the included fixture, not arbitrary office pages.
 
 | Check                                                 | Result                                   |
 | ----------------------------------------------------- | ---------------------------------------- |
-| Core, FFT, PNG adapter, invalid inputs                | 9 automated tests passed                 |
+| Core, FFT, PNG adapter, invalid and malicious inputs  | 14 automated tests passed                |
 | Chrome DPR 1, default blue/amplitude 1, four surfaces | 4/4 native PNG records recovered         |
 | Same four surfaces, 640×480 crop at offset 37,53      | 4/4 records recovered                    |
 | Same four surfaces, JPEG quality 85                   | 0/4 records recovered                    |
@@ -14,6 +14,13 @@ only. These results describe the included fixture, not arbitrary office pages.
 | Electron 37.10.0 macOS, DPR 2, default settings       | Dark and light native captures recovered |
 | Electron local Worker upload of those PNGs            | Both records recovered                   |
 | Electron secure preferences and overlay lifecycle     | Passed                                   |
+| Duplicate host and reloaded-module ownership checks   | Chrome and macOS Electron passed         |
+
+PNG regression cases verify that duplicate IHDR, interlaced inflation payloads,
+oversized/repeated palettes and malformed chunk/metadata structures are rejected
+before calling the production `pngjs` decoder. Valid non-interlaced grayscale,
+indexed and RGBA PNG controls remain accepted. The Node adapter now explicitly
+rejects Adam7/interlaced input rather than entering its unbounded inflate path.
 
 The final rectangular-host Chrome fixture has default carrier ON/OFF differences
 `0/0/1`. Its unmounted-to-neutral mounting differences are recorded separately in

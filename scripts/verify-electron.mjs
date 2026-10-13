@@ -5,6 +5,7 @@ import path from 'node:path'
 import assert from 'node:assert/strict'
 import { PNG } from 'pngjs'
 import { decodePNG } from '../dist/node/index.js'
+import { checkOverlayOwnership } from './check-overlay-ownership.mjs'
 
 const executablePath = process.env.ELECTRON_BINARY
 if (!executablePath)
@@ -141,6 +142,7 @@ try {
     if (host.style.position !== before) throw new Error('Host style changed')
   })
   report.lifecycle = true
+  report.ownership = await checkOverlayOwnership(page)
   assert.deepEqual(errors, [])
 } finally {
   await app?.close()

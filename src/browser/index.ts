@@ -3,6 +3,7 @@ export interface OverlayOptions extends Options {
   target: HTMLElement
   recordId: string
 }
+const activeHosts = new WeakMap<HTMLElement, ScreenOverlay>()
 
 /** Browser/Electron Renderer adapter. No Node integration or native module required. */
 export class ScreenOverlay {
@@ -30,6 +31,12 @@ export class ScreenOverlay {
   constructor(options: OverlayOptions) {
     const { target } = options
     if (!target?.ownerDocument?.defaultView) throw new Error('A browser HTMLElement is required')
+    if (
+      activeHosts.has(target) ||
+      Array.from(target.children).some((child) => child.hasAttribute('data-veiltrace'))
+    ) {
+      throw new Error('This host already has an active ScreenOverlay')
+    }
     const view = target.ownerDocument.defaultView
     const geometry = view.getComputedStyle(target)
     if (
@@ -88,6 +95,7 @@ export class ScreenOverlay {
     target.append(this.positive, this.negative)
     this.resize()
     view.addEventListener('resize', this.resize)
+    activeHosts.set(target, this)
   }
   private layer(name: string, blend: string, zIndex: number) {
     const layer = this.target.ownerDocument.createElement('div')
@@ -152,6 +160,7 @@ export class ScreenOverlay {
       this.target.style.isolation = this.oldIsolation
     if (this.ownedWillChange && this.target.style.willChange === this.ownedWillChange)
       this.target.style.willChange = this.oldWillChange
+    if (activeHosts.get(this.target) === this) activeHosts.delete(this.target)
     this.disposed = true
   }
 }

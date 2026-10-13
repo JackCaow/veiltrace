@@ -19,6 +19,10 @@ No Python, model download, native addon, or extra runtime process. Three ESM ent
 | `veiltrace/browser` | DOM overlay in Electron Renderer or browser     | Canvas and Chromium blend modes |
 | `veiltrace/node`    | PNG encoder/decoder in Node or Electron Main    | `pngjs` (JavaScript)            |
 
+The Node adapter accepts non-interlaced PNG only. It validates the complete chunk
+container before decoding; interlaced files are explicitly rejected because the
+dependency's synchronous Adam7 path does not enforce an inflate output limit.
+
 The package is not published to npm yet. Clone this repository and install a local tarball:
 
 ```sh
@@ -108,6 +112,8 @@ are measurements, not a perceptual guarantee.
   Benchmark `mountEffects` records unmounted-to-neutral changes separately.
 - Use a rectangular viewport host. Rounded hosts are rejected in this alpha due
   to Chromium clip-boundary artifacts; nested rounded content is allowed.
+- Each host can have one active `ScreenOverlay`. Dispose the old instance before
+  replacing it; duplicate mounts are rejected without changing the existing layers.
 - No phone-camera, HDR, rotation, perspective, adversarial-removal, production
   false-positive-rate, or cross-platform Electron acceptance claim.
 
