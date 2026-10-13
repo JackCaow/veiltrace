@@ -20,6 +20,9 @@ retained. Removing a host requires disposing its overlay.
 will-change hint to stabilize compositing during toggles. It restores
 its own inline changes on disposal, unless application code replaced those values.
 Review stacking contexts, compositing memory, and modal/teleport placement in the actual application.
+Layers leave a two-physical-pixel edge guard and follow the host's rounded corners
+to avoid blending directly on its antialiased clip boundary. Corner geometry is
+sampled at construction and resize; use a stable host without animated radii.
 Overlay layers have `pointer-events: none`, `aria-hidden`, and no mouse handlers.
 It does not cover native video surfaces, separate BrowserViews/webviews or other
 windows. It is not tamper-resistant.

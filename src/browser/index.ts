@@ -17,9 +17,15 @@ export class ScreenOverlay {
   private patchedIsolation = false
   private disposed = false
   private readonly resize = () => {
-    const ratio = this.target.ownerDocument.defaultView!.devicePixelRatio || 1
+    const view = this.target.ownerDocument.defaultView!
+    const ratio = view.devicePixelRatio || 1
     const size = `${256 / ratio}px ${256 / ratio}px`
     this.positive.style.backgroundSize = this.negative.style.backgroundSize = size
+    // Blending on the host's antialiased rounded boundary can double its coverage
+    // in Chromium. Leave a two-device-pixel guard inside the host clip instead.
+    const style = view.getComputedStyle(this.target)
+    const clip = `inset(${2 / ratio}px round ${style.borderRadius || '0px'})`
+    this.positive.style.clipPath = this.negative.style.clipPath = clip
   }
   constructor(options: OverlayOptions) {
     const { target } = options
